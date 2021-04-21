@@ -1,6 +1,6 @@
 {
   "$schema": "https://deno.land/x/denon@2.4.7/schema.json",
   "scripts": {
-    "start": "deno run --allow-net --allow-read app.ts"
+    "start": "deno run --allow-net --allow-read --allow-write --unstable app.ts"
   }
 }

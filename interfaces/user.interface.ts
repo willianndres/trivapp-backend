@@ -14,4 +14,6 @@ export interface UserSchema {
   name: string;
   email: string;
   password: string;
+  date: Date;
+  rol: number;
 }

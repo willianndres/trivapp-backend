@@ -36,13 +36,15 @@ export const verifyToken = async ({ request, response }: {
   response: Response;
 }, next: any) => {
   const tokenHeader = request.headers.get("Authorization");
+  if (!tokenHeader) {
+    response.status = 403;
+  }
   const tokenAuth = tokenHeader?.split(" ") ?? "";
   if (tokenAuth[0] !== "Bearer") {
     response.status = 403;
   }
   const jwt = tokenAuth[1];
   const verifyT = await verify(jwt, DENO_SECRET_JWT, "HS256");
-  console.log(verifyT);
   if (!verifyT) {
     response.status = 403;
   }
