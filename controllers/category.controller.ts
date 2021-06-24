@@ -38,7 +38,10 @@ export const addCategory = async (
 };
 
 export const deleteCategory = async (
-  { request, response }: { request: Request; response: Response },
+  { request, response }: {
+    request: Request;
+    response: Response;
+  },
 ) => {
   const body = await request.body();
   const values = await body.value;
@@ -58,6 +61,86 @@ export const deleteCategory = async (
     response.status = 404;
     response.body = {
       message: "No se ha encontrado el ID en la instrucción.",
+    };
+  }
+};
+
+export const getById = async (
+  { request, response, params }: {
+    request: Request;
+    response: Response;
+    params: { id: string };
+  },
+) => {
+  const getCategoryById = await categories.findOne({
+    _id: new Bson.ObjectId(params.id),
+  });
+
+  if (typeof getCategoryById !== "undefined") {
+    response.status = 200;
+    response.body = {
+      category_object: getCategoryById,
+    };
+  } else {
+    response.status = 404;
+    response.body = {
+      message: "No se ha encontrado el ID en la instrucción.",
+    };
+  }
+};
+
+export const updateCategory = async (
+  { request, response }: { request: Request; response: Response },
+) => {
+  const body = await request.body({ type: "form-data" });
+  const data = await body.value.read();
+
+  const categoryObject = await categories.findOne({
+    _id: new Bson.ObjectId(data.fields.id),
+  });
+  let file = "";
+  if (typeof categoryObject !== "undefined") {
+    if (typeof data.files !== "undefined" && data.fields.file != "") {
+      Deno.removeSync(categoryObject.file);
+      file = await fileHandle.fileWritePath(data.files, "categories");
+    }
+    if (file != "") {
+      const updateCat = await categories.updateOne(
+        { _id: new Bson.ObjectId(data.fields.id) },
+        { $set: { name: data.fields.name, file } },
+      );
+      if (updateCat) {
+        response.status = 200;
+        response.body = {
+          message: "Se ha actualizado correctamente la categoría.",
+        };
+      } else {
+        response.status = 404;
+        response.body = {
+          message: "No se ha podido encontrar el recurso.",
+        };
+      }
+    } else {
+      const updateCat = await categories.updateOne(
+        { _id: new Bson.ObjectId(data.fields.id) },
+        { $set: { name: data.fields.name } },
+      );
+      if (updateCat) {
+        response.status = 200;
+        response.body = {
+          message: "Se ha actualizado correctamente la categoría.",
+        };
+      } else {
+        response.status = 404;
+        response.body = {
+          message: "No se ha podido encontrar el recurso.",
+        };
+      }
+    }
+  } else {
+    response.status = 400;
+    response.body = {
+      message: "No se cuentra la categoría con el ID especificado.",
     };
   }
 };

@@ -9,9 +9,11 @@ router
     context.response.body = "Backend deno";
   })
   .get("/api/get-all-categories", verifyToken, categoryController.index)
+  .get("/api/get-category-by-id/:id", verifyToken, categoryController.getById)
   .post("/api/sign-up", authController.registerUser)
   .post("/api/sign-in", authController.loginUser)
   .post("/api/add-category", verifyToken, categoryController.addCategory)
+  .post("/api/update-category", verifyToken, categoryController.updateCategory)
   .post("/api/delete-category", verifyToken, categoryController.deleteCategory);
 
 export default router;
